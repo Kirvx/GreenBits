@@ -29,6 +29,8 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.greenaddress.greenapi.Network;
 import com.greenaddress.greenbits.ConnectivityObservable;
+import com.greenaddress.greenbits.ui.bitboat.BitBoatActivity;
+import com.greenaddress.greenbits.ui.bitrefill.BitRefillActivity;
 
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
@@ -433,6 +435,8 @@ public class TabbedMainActivity extends ActionBarActivity implements ActionBar.T
             return true;
         } else if (id == R.id.action_bitboat) {
             startActivity(new Intent(TabbedMainActivity.this, BitBoatActivity.class));
+        } else if (id == R.id.action_bitrefill) {
+            startActivity(new Intent(TabbedMainActivity.this, BitRefillActivity.class));
         } else if (id == R.id.action_exit) {
             //FIXME logout and exit logic
             getGAService().disconnect(false);
