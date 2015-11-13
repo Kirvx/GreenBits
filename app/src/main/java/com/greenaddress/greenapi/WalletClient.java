@@ -35,7 +35,6 @@ import org.spongycastle.crypto.digests.SHA512Digest;
 import org.spongycastle.crypto.macs.HMac;
 import org.spongycastle.crypto.params.KeyParameter;
 import org.spongycastle.util.encoders.Hex;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -55,12 +54,11 @@ import javax.annotation.Nullable;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import de.tavendo.autobahn.Wamp;
-import de.tavendo.autobahn.WampConnection;
-import de.tavendo.autobahn.WampOptions;
-import de.tavendo.autobahn.secure.WebSocket;
-import de.tavendo.autobahn.secure.WebSocketMessage;
-
+import rx.Subscriber;
+import ws.wamp.jawampa.WampClient;
+import ws.wamp.jawampa.WampClientBuilder;
+import ws.wamp.jawampa.WampError;
+import ws.wamp.jawampa.transport.netty.NettyWampClientConnectorProvider;
 
 public class WalletClient {
 
@@ -71,9 +69,10 @@ public class WalletClient {
 
     public final INotificationHandler m_notificationHandler;
     private final ListeningExecutorService es;
-    private WampConnection mConnection;
     private LoginData loginData;
     private ISigningWallet hdWallet;
+    private WampClient client;
+
 
     private String mnemonics = null;
 
@@ -116,6 +115,8 @@ public class WalletClient {
         mnemonics = null;
 
         hdWallet = null;
+
+        /*
         if (mConnection != null) {
             mConnection.unsubscribe();
             try {
@@ -124,6 +125,7 @@ public class WalletClient {
                 // ignore
             }
         }
+        */
     }
 
 
@@ -269,7 +271,8 @@ public class WalletClient {
     
     public ListenableFuture<Map<?, ?>> getBalance(final int subaccount) {
         final SettableFuture<Map<?, ?>> asyncWamp = SettableFuture.create();
-        mConnection.call("http://greenaddressit.com/txs/get_balance", Map.class, new Wamp.CallHandler() {
+        client
+        client.call("http://greenaddressit.com/txs/get_balance", Map.class, new Wamp.CallHandler() {
             @Override
             public void onResult(final Object result) {
                 asyncWamp.set((Map) result);
@@ -448,6 +451,56 @@ public class WalletClient {
     private ListenableFuture<Void> low_level_connect() {
         final SettableFuture<Void> asyncWamp = SettableFuture.create();
         final String wsuri = Network.GAIT_WAMP_URL;
+        final WampClient client;
+        try {
+            // Create a builder and configure the client
+            final WampClientBuilder builder = new WampClientBuilder();
+            builder.withConnectorProvider(new NettyWampClientConnectorProvider())
+                    .withUri(wsuri)
+
+
+                    //.withRealm("examplerealm")
+                    //.withInfiniteReconnects()
+                    //.withReconnectInterval(5, TimeUnit.SECONDS);
+            ;
+            // Create a client through the builder. This will not immediatly start
+            // a connection attempt
+
+            client = builder.build();
+
+
+            client.statusChanged()
+                    //.observeOn()
+                    .subscribe(new Subscriber<WampClient.State>() {
+                        @Override
+                        public void onCompleted() {
+
+                        }
+
+                        @Override
+                        public void onError(final Throwable e) {
+                            asyncWamp.setException(new GAException("Disconnected"));
+
+                        }
+
+                        @Override
+                        public void onNext(final WampClient.State state) {
+                            if (state instanceof WampClient.ConnectedState) {
+                                asyncWamp.set(null);
+                            } else if (state instanceof WampClient.DisconnectedState) {
+                                m_notificationHandler.onConnectionClosed(500);
+                                asyncWamp.setException(new GAException("Disconnected"));
+                            }
+                        }
+                    });
+
+        } catch (final WampError e) {
+            // Catch exceptions that will be thrown in case of invalid configuration
+            System.out.println(e);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+        /*
         mConnection = new WampConnection();
         final WampOptions options = new WampOptions();
         options.setReceiveTextMessagesRaw(true);
@@ -473,8 +526,6 @@ public class WalletClient {
                     c = null;
                 }
 
-                m_notificationHandler.onConnectionClosed(code);
-                asyncWamp.setException(new GAException(s));
 
             }
 
@@ -484,6 +535,7 @@ public class WalletClient {
                 c = close;
             }
         };
+
         try {
             mConnection.connect(wsuri, handler, options);
         } catch (final NullPointerException e) {
@@ -499,6 +551,7 @@ public class WalletClient {
             // don't call onConnectionClosed here because it results in infinite recursive reconnection
             // in GaService
         }
+          */
         return asyncWamp;
     }
 

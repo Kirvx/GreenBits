@@ -55,10 +55,10 @@ android {
         javaMaxHeapSize "2g"
     }
 }
+
 configurations {
     compile.exclude group: "org.json", module: "json"
 }
-
 
 dependencies {
     compile 'com.fasterxml.jackson:jackson-datatype-json-org:1.8.0'
@@ -66,11 +66,14 @@ dependencies {
     compile 'com.android.support:support-v4:23.1.0'
     compile 'com.android.support:appcompat-v7:23.1.0'
     compile 'com.google.zxing:core:3.2.1'
-    compile project (':app:material-dialogs:core'), project (':bitcoinj'), project (':bitcoinj:core')
+    compile project (':app:material-dialogs:core'), project(':bitcoinj'), project(':bitcoinj:core')
     compile 'com.google.protobuf:protobuf-java:2.6.1'
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.squareup.okhttp:okhttp:2.5.0'
+    compile 'ws.wamp.jawampa:jawampa-core:0.4.1'
+    compile 'ws.wamp.jawampa:jawampa-netty:0.4.1'
 }
+
 repositories {
     jcenter()
 }
