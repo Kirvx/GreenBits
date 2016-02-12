@@ -553,7 +553,7 @@ public class SPV {
 
             System.setProperty("user.home", gaService.getFilesDir().toString());
             final String trusted_addr = gaService.getSharedPreferences("TRUSTED", Context.MODE_PRIVATE).getString("address", "");
-            
+
             final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(gaService);
             final String proxyHost = sharedPref.getString("proxy_host", null);
             final String proxyPort = sharedPref.getString("proxy_port", null);
@@ -564,6 +564,8 @@ public class SPV {
                 final org.bitcoinj.core.Context context = new org.bitcoinj.core.Context(Network.NETWORK);
                 peerGroup = new PeerGroup(context, blockChain, new BlockingClientManager());
             } else {
+                System.setProperty("socksProxyHost", "");
+                System.setProperty("socksProxyPort", "");
                 if (trusted_addr.toLowerCase().contains(".onion")) {
                     try {
                         final org.bitcoinj.core.Context context = new org.bitcoinj.core.Context(Network.NETWORK);
