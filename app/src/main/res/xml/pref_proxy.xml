@@ -1,7 +1,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <EditTextPreference
-        android:defaultValue="@string/pref_default_host"
+        android:hint="@string/pref_default_host"
         android:inputType="textCapWords"
         android:key="proxy_host"
         android:maxLines="1"
@@ -10,7 +10,7 @@
         android:title="@string/pref_title_display_hostname"/>
 
     <EditTextPreference
-        android:defaultValue="@string/pref_default_port"
+        android:hint="@string/pref_default_port"
         android:inputType="number"
         android:key="proxy_port"
         android:maxLines="1"

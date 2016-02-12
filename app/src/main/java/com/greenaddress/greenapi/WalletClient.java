@@ -38,6 +38,8 @@ import org.spongycastle.util.encoders.Hex;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -79,6 +81,10 @@ public class WalletClient {
     public WalletClient(final INotificationHandler notificationHandler, final ListeningExecutorService es) {
         this.m_notificationHandler = notificationHandler;
         this.es = es;
+    }
+
+    public void setProxy(final String host, final String port) {
+        httpClient.setProxy(new Proxy(Proxy.Type.SOCKS, InetSocketAddress.createUnresolved(host, Integer.parseInt(port))));
     }
 
     private static List<String> split(final String words) {
@@ -451,6 +457,8 @@ public class WalletClient {
     private ListenableFuture<Void> low_level_connect() {
         final SettableFuture<Void> asyncWamp = SettableFuture.create();
         final String wsuri = Network.GAIT_WAMP_URL;
+
+        // FIXME: add proxy to wamp connection
         mConnection = new WampConnection();
         final WampOptions options = new WampOptions();
         options.setReceiveTextMessagesRaw(true);
