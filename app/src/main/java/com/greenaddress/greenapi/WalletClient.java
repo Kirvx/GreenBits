@@ -84,7 +84,7 @@ public class WalletClient {
     }
 
     public void setProxy(final String host, final String port) {
-        httpClient.setProxy(new Proxy(Proxy.Type.SOCKS, InetSocketAddress.createUnresolved(host, Integer.parseInt(port))));
+        httpClient.setProxy(new Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(host, Integer.parseInt(port))));
     }
 
     private static List<String> split(final String words) {
@@ -153,6 +153,7 @@ public class WalletClient {
             }
         } catch (final IOException io) {
             // pass
+            io.printStackTrace();
         }
 
         final Request request = new Request.Builder()
