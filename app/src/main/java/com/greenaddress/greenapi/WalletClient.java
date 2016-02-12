@@ -143,9 +143,22 @@ public class WalletClient {
     private final OkHttpClient httpClient = new OkHttpClient();
 
     private String getToken() throws IOException {
+        // try onion first if proxy is set, use normal domain if it fails (non Orbot socks)
+        try {
+            if (httpClient.getProxy() != null && !Network.GAIT_ONION.isEmpty()) {
+                final Request request = new Request.Builder()
+                        .url(String.format("http://%s/token/", Network.GAIT_ONION))
+                        .build();
+                return httpClient.newCall(request).execute().body().string();
+            }
+        } catch (final IOException io) {
+            // pass
+        }
+
         final Request request = new Request.Builder()
                 .url(Network.GAIT_TOKEN_URL)
                 .build();
+
         return httpClient.newCall(request).execute().body().string();
     }
 
@@ -458,7 +471,6 @@ public class WalletClient {
         final SettableFuture<Void> asyncWamp = SettableFuture.create();
         final String wsuri = Network.GAIT_WAMP_URL;
 
-        // FIXME: add proxy to wamp connection
         mConnection = new WampConnection();
         final WampOptions options = new WampOptions();
         options.setReceiveTextMessagesRaw(true);
@@ -496,6 +508,10 @@ public class WalletClient {
             }
         };
         try {
+            // FIXME: add proxy to wamp connection
+            // final String wstoruri = String.format("ws://%s/ws/inv", Network.GAIT_ONION);
+            // final String ws2toruri = String.format("ws://%s/v2/ws", Network.GAIT_ONION);
+
             mConnection.connect(wsuri, handler, options);
         } catch (final NullPointerException e) {
             // FIXME: it shouldn't be caught here, it's a workaround for the following exception
