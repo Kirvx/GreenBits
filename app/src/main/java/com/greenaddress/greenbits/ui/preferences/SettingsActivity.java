@@ -85,6 +85,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Obs
                 || GAPreferenceFragment.class.getName().equals(fragmentName)
                 || GeneralPreferenceFragment.class.getName().equals(fragmentName)
                 || SPVPreferenceFragment.class.getName().equals(fragmentName)
+                || ProxyPreferenceFragment.class.getName().equals(fragmentName)
                 || TwoFactorPreferenceFragment.class.getName().equals(fragmentName);
     }
 
