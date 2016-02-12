@@ -559,13 +559,13 @@ public class SPV {
             final String proxyPort = sharedPref.getString("proxy_port", null);
 
             if (proxyHost != null && proxyPort != null) {
-                System.setProperty("socksProxyHost", proxyHost);
-                System.setProperty("socksProxyPort", proxyPort);
+                System.setProperty("http.proxyHost", proxyHost);
+                System.setProperty("http.proxyPort", proxyPort);
                 final org.bitcoinj.core.Context context = new org.bitcoinj.core.Context(Network.NETWORK);
                 peerGroup = new PeerGroup(context, blockChain, new BlockingClientManager());
             } else {
-                System.setProperty("socksProxyHost", "");
-                System.setProperty("socksProxyPort", "");
+                System.setProperty("http.proxyHost", "");
+                System.setProperty("http.proxyPort", "");
                 if (trusted_addr.toLowerCase().contains(".onion")) {
                     try {
                         final org.bitcoinj.core.Context context = new org.bitcoinj.core.Context(Network.NETWORK);
