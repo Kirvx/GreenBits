@@ -585,7 +585,7 @@ public class SPV {
                     setupPeerGroup(peerGroup, s);
                 }
                 peerGroup.setMaxConnections(addresses.length);
-            } else if (trusted_addr.isEmpty()) {
+            } else if (!trusted_addr.isEmpty()) {
                 setupPeerGroup(peerGroup, trusted_addr);
                 peerGroup.setMaxConnections(1);
             } else {
