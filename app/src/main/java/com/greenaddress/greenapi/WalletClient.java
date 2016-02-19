@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.SocketAddress;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -91,6 +92,7 @@ public class WalletClient {
     private ISigningWallet hdWallet;
 
     private String mnemonics = null;
+    private SocketAddress proxyAddress = null;
 
     /**
      * Call handler.
@@ -177,8 +179,13 @@ public class WalletClient {
     }
 
     public void setProxy(final String host, final String port) {
-        httpClient.setProxy(new Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(host, Integer.parseInt(port))));
-    }
+        if (host != null && !host.equals("") && port != null && !port.equals("")) {
+            proxyAddress = new InetSocketAddress(host, Integer.parseInt(port));
+            httpClient.setProxy(new Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(host, Integer.parseInt(port))));
+        } else {
+            proxyAddress = null;
+            httpClient.setProxy(null);
+        }}
 
     private static List<String> split(final String words) {
         return new ArrayList<>(Arrays.asList(words.split("\\s+")));
@@ -537,6 +544,7 @@ public class WalletClient {
                 }
                 try {
                     builder.withConnectorProvider(connectorProvider)
+                            .withProxyAddress(proxyAddress)
                             .withUri(wsuri)
                             .withRealm("realm1")
                             .withNrReconnects(0)
@@ -557,7 +565,7 @@ public class WalletClient {
                     asyncWamp.setException(new GAException(e.toString()));
                     return;
                 }
-                
+
                 mConnection.statusChanged()
                     .observeOn(mScheduler)
                     .subscribe(new Action1<WampClient.State>() {
