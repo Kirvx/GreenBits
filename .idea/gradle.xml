@@ -16,6 +16,8 @@
             <option value="$PROJECT_DIR$/bitcoinj" />
             <option value="$PROJECT_DIR$/bitcoinj/core" />
             <option value="$PROJECT_DIR$/jawampa" />
+            <option value="$PROJECT_DIR$/jawampa/jawampa-core" />
+            <option value="$PROJECT_DIR$/jawampa/jawampa-netty" />
           </set>
         </option>
         <option name="myModules">
@@ -27,6 +29,8 @@
             <option value="$PROJECT_DIR$/bitcoinj" />
             <option value="$PROJECT_DIR$/bitcoinj/core" />
             <option value="$PROJECT_DIR$/jawampa" />
+            <option value="$PROJECT_DIR$/jawampa/jawampa-core" />
+            <option value="$PROJECT_DIR$/jawampa/jawampa-netty" />
           </set>
         </option>
       </GradleProjectSettings>
