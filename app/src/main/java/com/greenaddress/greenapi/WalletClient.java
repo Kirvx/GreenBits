@@ -62,7 +62,6 @@ import javax.crypto.spec.SecretKeySpec;
 import rx.Scheduler;
 import rx.functions.Action0;
 import rx.functions.Action1;
-import rx.schedulers.NewThreadScheduler;
 import rx.schedulers.Schedulers;
 import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.CallFlags;
@@ -70,8 +69,6 @@ import ws.wamp.jawampa.PubSubData;
 import ws.wamp.jawampa.Reply;
 import ws.wamp.jawampa.WampClient;
 import ws.wamp.jawampa.WampClientBuilder;
-import ws.wamp.jawampa.WampError;
-import ws.wamp.jawampa.WampRouterBuilder;
 import ws.wamp.jawampa.auth.client.WampCra;
 import ws.wamp.jawampa.connection.IWampConnectorProvider;
 import ws.wamp.jawampa.transport.netty.NettyWampClientConnectorProvider;
@@ -185,7 +182,8 @@ public class WalletClient {
         } else {
             proxyAddress = null;
             httpClient.setProxy(null);
-        }}
+        }
+    }
 
     private static List<String> split(final String words) {
         return new ArrayList<>(Arrays.asList(words.split("\\s+")));
@@ -243,7 +241,7 @@ public class WalletClient {
     private final OkHttpClient httpClient = new OkHttpClient();
 
     private String getToken() throws IOException {
-        // try onion first if proxy is set, use normal domain if it fails (non Orbot socks)
+        // try onion first if proxy is set, use normal domain if it fails (non Orbot proxy)
         try {
             if (httpClient.getProxy() != null && !Network.GAIT_ONION.isEmpty()) {
                 final Request request = new Request.Builder()
@@ -538,7 +536,7 @@ public class WalletClient {
                 final IWampConnectorProvider connectorProvider = new NettyWampClientConnectorProvider();
                 try {
                     token = getToken();
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     asyncWamp.setException(e);
                     return;
                 }
@@ -550,7 +548,7 @@ public class WalletClient {
                             .withNrReconnects(0)
                             .withAuthMethod(new WampCra(token))
                             .withAuthId(token);
-                } catch (ApplicationError e) {
+                } catch (final ApplicationError e) {
                     asyncWamp.setException(e);
                     return;
                 }
@@ -561,7 +559,7 @@ public class WalletClient {
 
                 try {
                     mConnection = builder.build();
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     asyncWamp.setException(new GAException(e.toString()));
                     return;
                 }
@@ -574,7 +572,7 @@ public class WalletClient {
                         boolean connected = false;
 
                         @Override
-                        public void call(WampClient.State newStatus) {
+                        public void call(final WampClient.State newStatus) {
                             if (newStatus instanceof WampClient.ConnectedState) {
                                 // Client got connected to the remote router
                                 // and the session was established
@@ -597,13 +595,13 @@ public class WalletClient {
                         }
                     }, new Action1<Throwable>() {
                         @Override
-                        public void call(Throwable throwable) {
+                        public void call(final Throwable throwable) {
                             Log.d(TAG, throwable.toString());
                         }
                     });
                 try {
                     mConnection.open();
-                } catch (IllegalStateException e) {
+                } catch (final IllegalStateException e) {
                     // already disconnected
                     return;
                 }
